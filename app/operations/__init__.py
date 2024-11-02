@@ -1,8 +1,8 @@
 """
-This file contains basic arithmetic functions for Addition, Subtraction, Multiplication,
-and Division. Each function takes two float numbers as inputs and returns the result of 
-the specified operation. The Division function includes error handling to prevent 
-Division by zero.
+This file contains basic arithmetic functions for addition, subtraction, multiplication,
+and division. Each function takes two float numbers as inputs and returns the result of 
+the specified operation. The division function includes error handling to prevent 
+division by zero.
 """
 
 def addition(a: float, b: float) -> float:
@@ -21,5 +21,5 @@ def division(a: float, b: float) -> float:
     """ Returns the result of dividing the first number by the second."""
     # It raises a ValueError if the second number (b) is zero to avoid division by zero.
     if b == 0:
-        raise ValueError("Division by zero is not allowed.")
+        raise ValueError("division by zero is not allowed.")
     return a / b
