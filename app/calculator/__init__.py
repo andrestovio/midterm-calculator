@@ -1,4 +1,4 @@
-from app.operations import Addition, Subtraction, Multiplication, Division
+from app.operations import addition, subtraction, multiplication, division
 
 
 def calculator():
@@ -28,14 +28,14 @@ def calculator():
 
             # Perform the requested operation.
             if operation == "add":
-                result = Addition(num1, num2)
+                result = addition(num1, num2)
             elif operation == "subtract":
-                result = Subtraction(num1, num2)
+                result = subtraction(num1, num2)
             elif operation == "multiply":
-                result = Multiplication(num1, num2)
+                result = multiplication(num1, num2)
             elif operation == "divide":
                 try:
-                    result = Division(num1, num2)
+                    result = division(num1, num2)
                 except ValueError as e:
                     print(e)
                     continue
