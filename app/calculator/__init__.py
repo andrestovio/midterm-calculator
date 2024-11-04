@@ -1,5 +1,8 @@
+# Import addition, subtraction, multiplication, and division operations from the operations module
 from app.operations import addition, subtraction, multiplication, division
 
+# Import History class from the history module
+from app.history import History
 
 def calculator():
     print("Welcome to the calculator REPL! Type 'exit' anytime to quit.")
