@@ -1,16 +1,21 @@
 """
 This module contains test cases for the History class in the `app.history` module.
-It uses pytest to validate the behavior of the add, get_history, undo_last, and clear
-methods of the History class. The tests are organized into positive and negative cases
-to ensure comprehensive coverage of both expected and edge case behaviors.
+It uses pytest to validate the behavior of the add, get_history, undo_last, clear,
+save, and load methods of the History class. The tests are organized into positive
+and negative cases to ensure comprehensive coverage of both expected and edge case
+behaviors.
 
-The test functions:
-- `test_add_and_get_history_positive`: Tests adding operations to history and retrieving them.
+Test functions:
+- `test_add_and_get_history_positive`: Tests adding operations to history and
+  retrieving them.
 - `test_undo_last_positive`: Tests undoing the last operation added to history.
-- `test_history_negative`: Tests edge cases and incorrect usage of the History class, such as
-  adding None and clearing the history.
+- `test_save_and_load_history_positive`: Tests saving history to and loading it from
+  a CSV file.
+- `test_history_negative`: Tests edge cases and incorrect usage of the History class,
+  such as adding None and clearing the history.
 """
 
+import pandas as pd
 import pytest
 from app.history import History
 
@@ -68,6 +73,39 @@ def test_undo_last_positive(initial_operations, expected_history):
     assert history.get_history() == expected_history
 
 
+# Positive test cases for save and load functionality
+@pytest.mark.parametrize("operations", [
+    (["add 2 + 3 = 5", "multiply 4 * 5 = 20"]),
+    (["add 10 + 15 = 25"]),
+    ([]),  # Empty history case
+])
+def test_save_and_load_history_positive(operations, tmp_path):
+    """
+    Tests the save and load methods of the History class with different operations.
+
+    Args:
+        operations (list): List of operations to add to history before saving.
+        tmp_path (path): Temporary directory provided by pytest for file operations.
+    """
+    # Create a History object and add operations
+    history = History()
+    for operation in operations:
+        history.add(operation)
+
+    # Define a temporary file path for saving and loading
+    file_path = tmp_path / "test_history.csv"
+
+    # Save the history to a CSV file
+    history.save(file_path)
+
+    # Create a new History object to load data
+    new_history = History()
+    new_history.load(file_path)
+
+    # Assert that the loaded history matches the original operations
+    assert new_history.get_history() == operations
+
+
 # Negative test cases for the History class
 @pytest.mark.parametrize("initial_operations, action, expected_exception", [
     (None, "add", TypeError),               # Adding None should raise TypeError
@@ -108,3 +146,39 @@ def test_history_negative(initial_operations, action, expected_exception):
         history.clear()
         # Confirm that the history is empty after clearing
         assert not history.get_history()
+
+
+# Negative test cases for save and load functionality
+@pytest.mark.parametrize("file_path, expected_message", [
+    ("non_existent_file.csv", "No file found at"),
+    ("incorrect_format.csv", "CSV file does not contain 'Operation' column."),
+])
+def test_load_history_negative(file_path, expected_message, tmp_path, capsys):
+    """
+    Tests the load method of the History class with incorrect file paths or formats.
+
+    Args:
+        file_path (str): Path to the CSV file to load history from.
+        expected_message (str): Expected message if loading fails.
+        tmp_path (path): Temporary directory provided by pytest for file operations.
+        capsys (CaptureFixture): Pytest fixture to capture stdout.
+    """
+    # Create a History object
+    history = History()
+
+    # Set up paths for testing file not found and incorrect format
+    if file_path == "incorrect_format.csv":
+        # Create an incorrect CSV file without 'Operation' column
+        incorrect_path = tmp_path / file_path
+        pd.DataFrame({"WrongColumn": ["data"]}).to_csv(incorrect_path, index=False)
+        file_path = incorrect_path
+    else:
+        # Set file path to non-existent file for testing file not found
+        file_path = tmp_path / file_path
+
+    # Load the history from the specified file path
+    history.load(file_path)
+
+    # Capture the output and check for the expected message
+    captured = capsys.readouterr()
+    assert expected_message in captured.out
