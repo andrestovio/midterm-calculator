@@ -2,11 +2,10 @@
 Tests for the calculator function, covering both positive and negative cases.
 
 The positive tests validate that the calculator performs basic operations correctly
-and includes tests for the history management commands (history, clear, undo).
+and includes tests for the history management commands (history, clear, undo, save).
 
-The negative tests check the calculator's error handling for history commands and
-ensure it responds correctly to invalid inputs such as requesting history on an empty
-history and using undo on an empty history.
+The negative tests check the calculator's error handling for invalid inputs, such as
+non-numeric values, unsupported operations, and history commands on an empty history.
 
 Each test case uses `capsys` to capture output and `unittest.mock.patch` to simulate
 user input.
@@ -21,25 +20,30 @@ from app.calculator import calculator
 @pytest.mark.parametrize("user_inputs, expected_outputs", [
     # Test basic calculation with history command
     (["add 1 2", "history", "exit"],
-     ["Result: 3.0", "Calculation History:", "add 1.0 2.0 = 3.0"]),  # History records
+     ["Result: 3.0", "Calculation History:", "add 1.0 2.0 = 3.0"]),
 
     # Test clearing the history after a calculation
     (["add 1 2", "clear", "history", "exit"],
-     ["Result: 3.0", "History cleared.", "Calculation History:"]),  # History cleared
+     ["Result: 3.0", "History cleared.", "Calculation History:"]),
 
     # Test undoing the last calculation
     (["multiply 4 5", "undo", "history", "exit"],
-     ["Result: 20.0", "Last calculation undone.", "Calculation History:"]),  # Undo works
+     ["Result: 20.0", "Last calculation undone.", "Calculation History:"]),
 
     # Test multiple entries and checking history
     (["add 1 2", "subtract 5 3", "multiply 2 3", "history", "exit"],
      ["Result: 3.0", "Result: 2.0", "Result: 6.0", "Calculation History:",
-      "add 1.0 2.0 = 3.0", "subtract 5.0 3.0 = 2.0", "multiply 2.0 3.0 = 6.0"]),  # Multiple history
+      "add 1.0 2.0 = 3.0", "subtract 5.0 3.0 = 2.0", "multiply 2.0 3.0 = 6.0"]),
 
     # Test history after multiple undo operations
     (["add 1 2", "subtract 4 2", "undo", "undo", "history", "exit"],
      ["Result: 3.0", "Result: 2.0", "Last calculation undone.",
-      "Last calculation undone.", "Calculation History:"]),  # Empty history after undo
+      "Last calculation undone.", "Calculation History:"]),
+
+    # Test saving and loading the history
+    (["add 10 20", "save", "clear", "load", "history", "exit"],
+     ["Result: 30.0", "History cleared.", "History saved to history.csv",
+      "History loaded from history.csv", "Calculation History:", "add 10.0 20.0 = 30.0"]),
 ])
 def test_calculator_positive_history_cases(user_inputs, expected_outputs, capsys):
     """
@@ -62,42 +66,49 @@ def test_calculator_positive_history_cases(user_inputs, expected_outputs, capsys
 @pytest.mark.parametrize("user_inputs, expected_outputs", [
     # Check undo with an empty history
     (["undo", "exit"],
-     ["Last calculation undone."]),  # Accept "Last calculation undone." as message
+     ["Last calculation undone."]),
 
     # Check history with an empty history
     (["history", "exit"],
-     ["Calculation History:"]),  # Should show empty history without errors
+     ["Calculation History:"]),
 
     # Check clear on empty history
     (["clear", "history", "exit"],
-     ["History cleared.", "Calculation History:"]),  # Clear and show empty history
+     ["History cleared.", "Calculation History:"]),
 
     # Check mix of commands with empty history
     (["clear", "undo", "history", "exit"],
-     ["History cleared.", "Last calculation undone.",
-      "Calculation History:"]),  # Clear and undo without errors
+     ["History cleared.", "Last calculation undone.", "Calculation History:"]),
 
     # Test invalid operation name
     (["unknown 1 2", "exit"],
      ["Unknown operation 'unknown'. Supported operations: add, subtract, "
-      "multiply, divide."]),  # Unknown operation message
+      "multiply, divide."]),
 
     # Test division by zero
     (["divide 10 0", "exit"],
-     ["division by zero is not allowed."]),  # Division by zero error
+     ["division by zero is not allowed."]),
 
     # Test non-numeric input
     (["add a b", "exit"],
-     ["Invalid input. Please follow the format: <operation> <num1> <num2>"]),# Invalid input message
+     ["Invalid input. Please follow the format: <operation> <num1> <num2>"]),
 
     # Test insufficient arguments
     (["add 1", "exit"],
-     ["Invalid input. Please follow the format: <operation> <num1> <num2>"]),# Invalid input message
+     ["Invalid input. Please follow the format: <operation> <num1> <num2>"]),
 
     # Test excess arguments
     (["add 1 2 3", "exit"],
-     ["Invalid input. Please follow the format: <operation> <num1> <num2>"]),# Invalid input message
-])
+     ["Invalid input. Please follow the format: <operation> <num1> <num2>"]),
+
+    # Test saving history with no calculations
+    (["clear", "save", "history", "exit"],
+     ["History cleared.", "History saved to history.csv", "Calculation History:"]),
+
+    # Test loading history when "history.csv" is empty
+    (["clear", "save", "load", "history", "exit"],
+    ["History cleared.", "History saved to history.csv",
+      "History loaded from history.csv", "Calculation History:"]),])
 def test_calculator_negative_cases(user_inputs, expected_outputs, capsys):
     """
     Tests the calculator function with invalid inputs and history management commands,
