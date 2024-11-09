@@ -17,6 +17,11 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    # Define environment variables here using GitHub secrets
+    env:
+      LOG_FILE: ${{ secrets.LOG_FILE }}
+      HISTORYCSV_FILENAME: ${{ secrets.HISTORYCSV_FILE }}
+
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
