@@ -6,7 +6,7 @@ save/load calculation history to/from "default.csv".
 """
 from app.logging import logger
 # Import the necessary math operations from the operations module
-from app.operations import addition, subtraction, multiplication, division
+from app.operations import addition, subtraction, multiplication, division,modulus,exponent
 
 # Import History class from the history module
 from app.history import History
@@ -31,7 +31,7 @@ def calculator():
 
     while True:
         user_input = input(
-            "Enter an operation (add, subtract, multiply, divide) and two "
+            "Enter an operation (add, subtract, multiply, divide, modulus, exponent) and two "
             "numbers, or a command (history, clear, undo, save, load): "
         )
         logger.info("User input received: %s", user_input)
@@ -97,9 +97,18 @@ def calculator():
                     logger.error("Division by zero attempted.")
                     print(error)
                     continue
+            elif operation == "modulus":
+                try:
+                    result = modulus(num1, num2)
+                except ValueError as error:
+                    logger.error("Modulus by zero attempted.")
+                    print(error)
+                    continue
+            elif operation == "exponent":
+                result = exponent(num1, num2)
             else:
                 logger.warning("Unknown operation: %s", operation)
-                print(f"Unknown operation '{operation}'. Supported operations: add, subtract, multiply, divide.")
+                print(f"Unknown operation '{operation}'. Supported operations: add, subtract, multiply, divide, modulus, exponent..")
                 continue
 
             calculation_str = f"{operation} {num1} {num2} = {result}"

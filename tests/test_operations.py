@@ -14,9 +14,41 @@ to check for expected exceptions in the negative tests.
 """
 
 import pytest
-from app.operations import addition, subtraction, multiplication, division
+from app.operations import addition, subtraction, multiplication, division, modulus, exponent
 
 # Positive test cases for arithmetic functions
+
+# Modulus tests
+@pytest.mark.parametrize("a, b, expected", [
+    (10, 3, 1),       # Positive integers
+    (10.5, 3, 1.5),   # Positive float and integer
+    (-10, 3, 2),      # Negative integer, positive divisor
+    (10, -3, -2)      # Positive integer, negative divisor
+])
+def test_modulus_positive(a, b, expected):
+    """Tests that the modulus function returns the expected result for valid inputs."""
+    assert modulus(a, b) == expected
+
+# Exponent tests
+@pytest.mark.parametrize("a, b, expected", [
+    (2, 3, 8),       # Positive integer exponentiation
+    (2.5, 2, 6.25),  # Positive float base
+    (-2, 3, -8),     # Negative base
+    (2, -1, 0.5)     # Negative exponent
+])
+def test_exponent_positive(a, b, expected):
+    """Tests that the exponent function returns the expected result for valid inputs."""
+    assert exponent(a, b) == expected
+
+# Negative test cases for modulus (modulus by zero)
+@pytest.mark.parametrize("a, b", [
+    (1, 0),           # Positive numerator, zero denominator
+    (-1, 0),          # Negative numerator, zero denominator
+])
+def test_modulus_by_zero(a, b):
+    """Tests that modulus by zero raises a ValueError."""
+    with pytest.raises(ValueError, match="modulus by zero is not allowed."):
+        modulus(a, b)
 
 # Positive test cases for the addition function
 @pytest.mark.parametrize("a, b, expected", [
@@ -61,7 +93,6 @@ def test_multiplication_positive(a, b, expected):
 def test_division_positive(a, b, expected):
     """Tests that the division function returns the expected result for valid inputs."""
     assert division(a, b) == expected
-
 
 # Negative test cases for arithmetic functions
 
