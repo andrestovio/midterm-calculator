@@ -93,7 +93,7 @@ def test_save_and_load_history_positive(operations, tmp_path):
         history.add(operation)
 
     # Define a temporary file path for saving and loading
-    file_path = tmp_path / "test_history.csv"
+    file_path = tmp_path / "default.csv"
 
     # Save the history to a CSV file
     history.save(file_path)

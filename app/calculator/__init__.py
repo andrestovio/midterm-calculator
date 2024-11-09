@@ -2,7 +2,7 @@
 A simple calculator REPL that can perform addition, subtraction, multiplication,
 and division. The calculator includes a history feature allowing users to view
 past calculations, clear history, undo the last calculation, and automatically
-save/load calculation history to/from "history.csv".
+save/load calculation history to/from "default.csv".
 """
 from app.logging import logger
 # Import the necessary math operations from the operations module
@@ -15,7 +15,6 @@ from dotenv import load_dotenv
 
 # Load environment
 load_dotenv()
-
 
 def calculator():
     """
@@ -64,13 +63,15 @@ def calculator():
         elif user_input.lower() == "save":
             history_file = os.getenv("HISTORYCSV_FILE", "default.csv")
             history.save(history_file)
-            logger.info("Calculation history saved to {history_file}.")
+            logger.info("Calculation history saved to %s.", history_file)
+            print(f"History saved to {history_file}.")
             continue
 
         elif user_input.lower() == "load":
             history_file = os.getenv("HISTORYCSV_FILE", "default.csv")
             history.load(history_file)
-            logger.info("Calculation history loaded from {history_file}.")
+            logger.info("Calculation history loaded from %s.", history_file)
+            print(f"History loaded from {history_file}.")
             continue
 
         else:
