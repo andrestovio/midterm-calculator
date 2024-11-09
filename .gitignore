@@ -163,4 +163,5 @@ cython_debug/
 
 # Ignore history and log files
 history.csv
+default.csv
 calculator.log

@@ -42,8 +42,8 @@ from app.calculator import calculator
 
     # Test saving and loading the history
     (["add 10 20", "save", "clear", "load", "history", "exit"],
-     ["Result: 30.0", "History cleared.", "History saved to history.csv",
-      "History loaded from history.csv", "Calculation History:", "add 10.0 20.0 = 30.0"]),
+     ["Result: 30.0", "History cleared.", "History saved to default.csv",
+      "History loaded from default.csv", "Calculation History:", "add 10.0 20.0 = 30.0"]),
 ])
 def test_calculator_positive_history_cases(user_inputs, expected_outputs, capsys):
     """
@@ -103,12 +103,12 @@ def test_calculator_positive_history_cases(user_inputs, expected_outputs, capsys
 
     # Test saving history with no calculations
     (["clear", "save", "history", "exit"],
-     ["History cleared.", "History saved to history.csv", "Calculation History:"]),
+     ["History cleared.", "History saved to default.csv", "Calculation History:"]),
 
-    # Test loading history when "history.csv" is empty
+    # Test loading history when "default.csv" is empty
     (["clear", "save", "load", "history", "exit"],
-    ["History cleared.", "History saved to history.csv",
-      "History loaded from history.csv", "Calculation History:"]),])
+    ["History cleared.", "History saved to default.csv",
+      "History loaded from default.csv", "Calculation History:"]),])
 def test_calculator_negative_cases(user_inputs, expected_outputs, capsys):
     """
     Tests the calculator function with invalid inputs and history management commands,

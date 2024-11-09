@@ -1,5 +1,7 @@
 import pandas as pd
 from app.logging import logger
+import os
+
 class History:
     """
     A simple history tracker for a calculator that records every operation 
@@ -64,36 +66,38 @@ class History:
             last_operation = self.history.pop()
             logger.info("Undid last operation: %s", last_operation)
 
-    def save(self, file_path: str):
+    def save(self, file_path: str = None):
         """
         Saves the history to a CSV file.
 
         Args:
             file_path (str): The path to the CSV file where the history 
-            will be saved.
+            will be saved. Defaults to the environment variable or "default.csv".
         """
+        file_path = file_path or os.getenv("HISTORYCSV_FILE", "default.csv")
         df = pd.DataFrame(self.history, columns=["Operation"])
         df.to_csv(file_path, index=False)
         print(f"History saved to {file_path}")
-        logger.info(f"History saved to {file_path}")
+        logger.info("History saved to %s", file_path)
 
-    def load(self, file_path: str):
+    def load(self, file_path: str = None):
         """
         Loads history from a CSV file and populates the history list.
 
         Args:
             file_path (str): The path to the CSV file from which the history 
-            will be loaded.
+            will be loaded. Defaults to the environment variable or "default.csv".
         """
+        file_path = file_path or os.getenv("HISTORYCSV_FILE", "default.csv")
         try:
             df = pd.read_csv(file_path)
             if 'Operation' in df.columns:
                 self.history = df['Operation'].tolist()
                 print(f"History loaded from {file_path}")
-                logger.info(f"History loaded from %s", {file_path})
+                logger.info("History loaded from %s", file_path)
             else:
                 print("CSV file does not contain 'Operation' column.")
                 logger.warning("CSV file does not contain 'Operation' column.")
         except FileNotFoundError:
             print(f"No file found at {file_path}")
-            logger.error(f"No file found at %s", {file_path})
+            logger.error("No file found at %s", file_path)
