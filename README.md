@@ -85,4 +85,7 @@ Calculation results
 Errors (e.g., invalid input, division by zero)
 Logs are saved to the file specified in the .env file under LOG_FILE
 
+VIDEO LINK:
+https://youtu.be/4tMNhhuWdZc
+
 Andres Tovio Pabon
