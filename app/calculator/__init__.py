@@ -10,6 +10,11 @@ from app.operations import addition, subtraction, multiplication, division
 
 # Import History class from the history module
 from app.history import History
+import os
+from dotenv import load_dotenv
+
+# Load environment
+load_dotenv()
 
 
 def calculator():
@@ -57,13 +62,15 @@ def calculator():
             continue
 
         elif user_input.lower() == "save":
-            history.save("history.csv")
-            logger.info("Calculation history saved to 'history.csv'.")
+            history_file = os.getenv("HISTORYCSV_FILE", "default.csv")
+            history.save(history_file)
+            logger.info("Calculation history saved to {history_file}.")
             continue
 
         elif user_input.lower() == "load":
-            history.load("history.csv")
-            logger.info("Calculation history loaded from 'history.csv'.")
+            history_file = os.getenv("HISTORYCSV_FILE", "default.csv")
+            history.load(history_file)
+            logger.info("Calculation history loaded from {history_file}.")
             continue
 
         else:
