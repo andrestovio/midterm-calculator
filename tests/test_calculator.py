@@ -1,11 +1,12 @@
 """
-Tests for the calculator function, covering both positive and negative cases.
+Unit tests for the calculator function, covering both positive and negative cases.
 
 The positive tests validate that the calculator performs basic operations correctly
-and includes tests for the history management commands (history, clear, undo, save).
+and includes tests for history management commands (history, clear, undo, save, load),
+as well as the modulus and exponent operations.
 
 The negative tests check the calculator's error handling for invalid inputs, such as
-non-numeric values, unsupported operations, and history commands on an empty history.
+non-numeric values, unsupported operations, division by zero, and modulus by zero.
 
 Each test case uses `capsys` to capture output and `unittest.mock.patch` to simulate
 user input.
@@ -14,7 +15,6 @@ user input.
 from unittest.mock import patch
 import pytest
 from app.calculator import calculator
-
 
 # Positive test cases for the calculator function, including history management
 @pytest.mark.parametrize("user_inputs, expected_outputs", [
@@ -44,6 +44,14 @@ from app.calculator import calculator
     (["add 10 20", "save", "clear", "load", "history", "exit"],
      ["Result: 30.0", "History cleared.", "History saved to default.csv",
       "History loaded from default.csv", "Calculation History:", "add 10.0 20.0 = 30.0"]),
+
+    # Test modulus operation
+    (["modulus 10 3", "history", "exit"],
+     ["Result: 1.0", "Calculation History:", "modulus 10.0 3.0 = 1.0"]),
+
+    # Test exponent operation
+    (["exponent 2 3", "history", "exit"],
+     ["Result: 8.0", "Calculation History:", "exponent 2.0 3.0 = 8.0"]),
 ])
 def test_calculator_positive_history_cases(user_inputs, expected_outputs, capsys):
     """
@@ -83,11 +91,15 @@ def test_calculator_positive_history_cases(user_inputs, expected_outputs, capsys
     # Test invalid operation name
     (["unknown 1 2", "exit"],
      ["Unknown operation 'unknown'. Supported operations: add, subtract, "
-      "multiply, divide."]),
+      "multiply, divide, modulus, exponent."]),
 
     # Test division by zero
     (["divide 10 0", "exit"],
      ["division by zero is not allowed."]),
+
+    # Test modulus by zero
+    (["modulus 10 0", "exit"],
+     ["modulus by zero is not allowed."]),
 
     # Test non-numeric input
     (["add a b", "exit"],
@@ -108,7 +120,8 @@ def test_calculator_positive_history_cases(user_inputs, expected_outputs, capsys
     # Test loading history when "default.csv" is empty
     (["clear", "save", "load", "history", "exit"],
     ["History cleared.", "History saved to default.csv",
-      "History loaded from default.csv", "Calculation History:"]),])
+      "History loaded from default.csv", "Calculation History:"]),
+])
 def test_calculator_negative_cases(user_inputs, expected_outputs, capsys):
     """
     Tests the calculator function with invalid inputs and history management commands,
