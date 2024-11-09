@@ -4,7 +4,7 @@ and division. The calculator includes a history feature allowing users to view
 past calculations, clear history, undo the last calculation, and automatically
 save/load calculation history to/from "history.csv".
 """
-
+from app.logging import logger
 # Import the necessary math operations from the operations module
 from app.operations import addition, subtraction, multiplication, division
 
@@ -18,69 +18,64 @@ def calculator():
     and division, with support for viewing, clearing, undoing, saving, and
     loading calculation history.
     """
-    # Display welcome message and instructions for using the calculator
+    logger.info("Calculator started.")
+
     print("Welcome to the calculator REPL! Type 'exit' anytime to quit.")
     print("Additional commands: 'history', 'clear', 'undo', 'save', 'load'.")
 
-    # Create a History object to manage the history of calculations
     history = History()
 
-    # Start the REPL loop to continuously prompt user for input
     while True:
-        # Prompt the user for an operation or command
         user_input = input(
             "Enter an operation (add, subtract, multiply, divide) and two "
             "numbers, or a command (history, clear, undo, save, load): "
         )
+        logger.info("User input received: %s", user_input)
 
-        # Handle the 'exit' command to quit the calculator
         if user_input.lower() == "exit":
+            logger.info("Calculator exited by user.")
             print("Exiting calculator...")
             break
 
-        # Handle the 'history' command to display all past calculations
         elif user_input.lower() == "history":
+            logger.info("Displaying calculation history.")
             print("Calculation History:")
             for calc in history.get_history():
                 print(calc)
             continue
 
-        # Handle the 'clear' command to remove all history entries
         elif user_input.lower() == "clear":
             history.clear()
+            logger.info("Calculation history cleared.")
             print("History cleared.")
             continue
 
-        # Handle the 'undo' command to remove the last calculation
         elif user_input.lower() == "undo":
             history.undo_last()
+            logger.info("Last calculation undone.")
             print("Last calculation undone.")
             continue
 
-        # Handle the 'save' command to save history to "history.csv"
         elif user_input.lower() == "save":
             history.save("history.csv")
+            logger.info("Calculation history saved to 'history.csv'.")
             continue
 
-        # Handle the 'load' command to load history from "history.csv"
         elif user_input.lower() == "load":
             history.load("history.csv")
+            logger.info("Calculation history loaded from 'history.csv'.")
             continue
 
-        # Process the input as a calculation if it is not a command
         else:
             try:
-                # Split the input into operation and numbers
                 operation, num1, num2 = user_input.lower().split()
-                # Convert numbers to float for calculations
                 num1, num2 = float(num1), float(num2)
+                logger.info("Operation: %s, Num1: %s, Num2: %s", operation, num1, num2)
             except ValueError:
-                # Print error if input format is incorrect
-                print("Invalid input. Please follow the format: "
-                      "<operation> <num1> <num2>")
+                logger.error("Invalid input format for operation.")
+                print("Invalid input. Please follow the format: <operation> <num1> <num2>")
                 continue
 
-            # Perform the requested operation and calculate the result
             if operation == "add":
                 result = addition(num1, num2)
             elif operation == "subtract":
@@ -89,20 +84,18 @@ def calculator():
                 result = multiplication(num1, num2)
             elif operation == "divide":
                 try:
-                    # Attempt division and handle division by zero
                     result = division(num1, num2)
                 except ValueError as error:
+                    logger.error("Division by zero attempted.")
                     print(error)
                     continue
             else:
-                # Print error if the operation is not recognized
-                print(f"Unknown operation '{operation}'. Supported operations: "
-                      "add, subtract, multiply, divide.")
+                logger.warning("Unknown operation: %s", operation)
+                print(f"Unknown operation '{operation}'. Supported operations: add, subtract, multiply, divide.")
                 continue
 
-            # Store the calculation in the history
             calculation_str = f"{operation} {num1} {num2} = {result}"
             history.add(calculation_str)
+            logger.info("Performed calculation: %s", calculation_str)
 
-            # Print the result of the calculation
             print(f"Result: {result}")

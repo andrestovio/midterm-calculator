@@ -1,5 +1,5 @@
 import pandas as pd
-
+from app.logging import logger
 class History:
     """
     A simple history tracker for a calculator that records every operation 
@@ -20,6 +20,7 @@ class History:
     def __init__(self):
         """Initializes the History object with an empty history list."""
         self.history = []
+        logger.info("History instance created.")
 
     def add(self, operation: str):
         """
@@ -33,9 +34,11 @@ class History:
             TypeError: If the operation is not a string.
         """
         if not isinstance(operation, str):
+            logger.error("Operation must be a string.")
             raise TypeError("Operation must be a string.")
         
         self.history.append(operation)
+        logger.info("Added operation to history: %s", operation)
 
     def get_history(self) -> list:
         """
@@ -44,11 +47,13 @@ class History:
         Returns:
             list: The list of all operations in the history.
         """
+        logger.info("Retrieving calculation history.")
         return self.history
 
     def clear(self):
         """Clears all entries in the history."""
         self.history.clear()
+        logger.info("Cleared calculation history.")
 
     def undo_last(self):
         """
@@ -56,7 +61,8 @@ class History:
         If history is empty, it does nothing.
         """
         if self.history:
-            self.history.pop()
+            last_operation = self.history.pop()
+            logger.info("Undid last operation: %s", last_operation)
 
     def save(self, file_path: str):
         """
@@ -69,6 +75,7 @@ class History:
         df = pd.DataFrame(self.history, columns=["Operation"])
         df.to_csv(file_path, index=False)
         print(f"History saved to {file_path}")
+        logger.info(f"History saved to {file_path}")
 
     def load(self, file_path: str):
         """
@@ -83,7 +90,10 @@ class History:
             if 'Operation' in df.columns:
                 self.history = df['Operation'].tolist()
                 print(f"History loaded from {file_path}")
+                logger.info(f"History loaded from %s", {file_path})
             else:
                 print("CSV file does not contain 'Operation' column.")
+                logger.warning("CSV file does not contain 'Operation' column.")
         except FileNotFoundError:
             print(f"No file found at {file_path}")
+            logger.error(f"No file found at %s", {file_path})
